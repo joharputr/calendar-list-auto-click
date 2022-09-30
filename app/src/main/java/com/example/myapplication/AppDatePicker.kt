@@ -4,11 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
+import android.util.Log
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import java.util.*
-
 
 class AppDatePicker(val ctx: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
     FrameLayout(ctx, attrs, defStyleAttr, defStyleRes) {
@@ -48,16 +49,22 @@ class AppDatePicker(val ctx: Context, attrs: AttributeSet?, defStyleAttr: Int, d
             layoutManager = LinearLayoutManager(context)
         }
     }
+
     lateinit var appAdapter:AppDatePickerAdapter
 
     fun fillData(data: List<DateData>) {
+        Log.d("filldata", " = ${Gson().toJson(data)}");
         appAdapter = AppDatePickerAdapter(data, ctx, typedArray, startDate, maxDate)
         recyclerView.adapter = appAdapter
         recyclerView.scrollToPosition(appAdapter.getCurrentPosition())
     }
 
+    //add data
     fun fillData(defaultData:List<String>,data: List<DateData>) {
-        appAdapter = AppDatePickerAdapter(data, ctx, typedArray, startDate, maxDate,defaultData)
+        appAdapter = AppDatePickerAdapter(
+            data, ctx, typedArray,
+            startDate, maxDate, defaultData
+        )
         recyclerView.adapter = appAdapter
         recyclerView.scrollToPosition(appAdapter.getCurrentPosition())
     }
@@ -70,7 +77,6 @@ class AppDatePicker(val ctx: Context, attrs: AttributeSet?, defStyleAttr: Int, d
 
     fun focusTo(it: Long?) {
         if(it!=null){
-
             with(Calendar.getInstance()){
                 timeInMillis = it
                 var lastCurrentPosition = appAdapter.lastCurrentPosition
@@ -85,11 +91,16 @@ class AppDatePicker(val ctx: Context, attrs: AttributeSet?, defStyleAttr: Int, d
 }
 
 
-interface OnItemClickListener{
-    fun onItemClick(date:Calendar,data:List<String>? )
+interface OnItemClickListener {
+    fun onItemClick(date: Calendar, data: List<String>?)
 }
 
 data class DateData(
     val date: Calendar,
     val data: List<String>
+)
+
+data class MenuList(
+    val id: Int,
+    val name: String
 )

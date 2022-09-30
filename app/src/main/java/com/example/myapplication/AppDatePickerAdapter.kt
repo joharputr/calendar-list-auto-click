@@ -15,7 +15,7 @@ import android.widget.BaseAdapter
 import android.widget.ListView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.card.MaterialCardView
+import com.google.gson.Gson
 import java.text.DateFormatSymbols
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -28,7 +28,6 @@ class AppDatePickerAdapter(
     maxDate: Calendar,
     private val defaultData: List<String>? = null
 ) : RecyclerView.Adapter<AppDatePickerViewHolder>() {
-
 
     var listener: OnItemClickListener? = null
 
@@ -100,17 +99,18 @@ class AppDatePickerAdapter(
         )
     }
 
+    //list calendar
+    private val row: Long = TimeUnit.DAYS.convert(
+        maxDate.time.time - startDate.time.time,
+        TimeUnit.MILLISECONDS
+    )
 
-    private val row: Long =
-        TimeUnit.DAYS.convert(
-            maxDate.time.time - startDate.time.time,
-            TimeUnit.MILLISECONDS
-        )
+    //mirip distinct
     private val mapped = data.associate {
+        Log.d("ittt= ${it.data}", "= ")
         val diff = it.date.time.time - startDate.time.time
         TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS).toInt() to it.data
     }
-
 
     fun getCurrentPosition(): Int {
         lastCurrentPosition = TimeUnit.DAYS.convert(
@@ -120,7 +120,6 @@ class AppDatePickerAdapter(
         Log.e("LastCurrent"," #1 ${lastCurrentPosition}")
         return lastCurrentPosition
     }
-
 
     fun findPosition(cal: Calendar): Int {
         val data =
@@ -147,13 +146,14 @@ class AppDatePickerAdapter(
                 with(Calendar.getInstance()) {
                     listener?.let {
                         time = startDate.time
+                        Log.d("adapterPosition  =", "= ${adapterPosition}")
                         add(Calendar.DATE, adapterPosition)
                         mapped[adapterPosition]
+                        Log.d("Dataaa", " = ${Gson().toJson(mapped)}")
                         val lastPos = lastCurrentPosition
-                        it.onItemClick(this, mapped[adapterPosition])
+                        it.onItemClick(this, mapped.get(adapterPosition))
                         lastCurrentPosition = adapterPosition
-
-                        Log.e("LastCurrent"," #3 ${lastCurrentPosition}")
+                        Log.e("LastCurrent", " #3 ${lastCurrentPosition}")
                         notifyItemChanged(lastPos)
                         notifyItemChanged(lastCurrentPosition)
                     }
@@ -162,6 +162,7 @@ class AppDatePickerAdapter(
             val cliclListener = View.OnClickListener {
                 listener()
             }
+
             this.itemView.setOnClickListener {
                 listener()
             }
@@ -173,18 +174,22 @@ class AppDatePickerAdapter(
                 listener()
             }
             this.itemView.findViewById<ListView>(R.id.dataList).setOnTouchListener { view, event ->
-                if(event.action == MotionEvent.ACTION_UP ){
+                if (event.action == MotionEvent.ACTION_UP) {
+                    //klik item
                     listener()
                 }
                 false
             }
-
         }
 
+
+    //position ikut list yg di getitemcount
     override fun onBindViewHolder(holder: AppDatePickerViewHolder, position: Int) {
+        Log.d("mapped ", " = ${Gson().toJson(mapped)}")
+        Log.d("poss ", " = ${Gson().toJson(position)}")
+
         holder.bind(mapped[position], position)
     }
-
 
     override fun getItemCount(): Int = row.toInt()
 }
@@ -198,7 +203,6 @@ class AppDatePickerViewHolder(
     RecyclerView.ViewHolder(itemView) {
 
     private val dateFormatSymbols: DateFormatSymbols = DateFormatSymbols()
-
     fun bind(data: List<String>?, pos: Int) {
         with(itemView) {
             if (adapterPosition == adapter.lastCurrentPosition) {
@@ -206,6 +210,8 @@ class AppDatePickerViewHolder(
             } else {
                 setBackgroundColor(adapter.pickerBackgroundColor)
             }
+
+            //sama kaya run
             with(Calendar.getInstance()) {
                 time = startDate.time
                 add(Calendar.DATE, pos)
@@ -216,12 +222,14 @@ class AppDatePickerViewHolder(
                     setTypeface(adapter.dayOfMonthFont, Typeface.BOLD)
                     setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.dayOfMonthFontSizeInDp)
                 }
+
                 findViewById<TextView>(R.id.monthText).apply {
                     setTextColor(adapter.monthFontColor)
                     text = dateFormatSymbols.months[get(Calendar.MONTH)]
                     typeface = adapter.monthFont
                     setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.monthFontSizeInDp)
                 }
+
                 findViewById<TextView>(R.id.dayOfWeekText).apply {
                     setTextColor(adapter.dayOfWeekColor)
                     text =
@@ -237,19 +245,23 @@ class AppDatePickerViewHolder(
                     typeface = adapter.yearFont
                     setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.yearFontSizeInDp)
                 }
+
+                Log.d("dalist", " = ${Gson().toJson(data)}")
                 findViewById<ListView>(R.id.dataList).adapter = data?.let {
                     InnerDataAdapter(context, adapter, data)
                 } ?: kotlin.run {
+                    //kalau null pake default data
                     defaultData?.let {
-                        InnerDataAdapter(context, adapter, it)
+                        InnerDataAdapter(context, adapter, defaultData)
                     }
                 }
             }
         }
-
     }
 }
 
+
+//di dalam list
 class InnerDataAdapter(
     private val context: Context,
     private val parentAdapter: AppDatePickerAdapter,
@@ -260,21 +272,27 @@ class InnerDataAdapter(
         return data.size
     }
 
-
     override fun getItem(p0: Int): Any = data[p0]
 
     override fun getItemId(p0: Int): Long = data[p0].hashCode().toLong()
 
-    @SuppressLint("ViewHolder")
+
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view = if (convertView == null) {
             LayoutInflater.from(context).inflate(R.layout.date_picker_item, parent, false).apply {
                 this.findViewById<TextView>(R.id.item).text = data[position]
             }
         } else {
+            Log.d("unull", " = ")
             convertView.findViewById<TextView>(R.id.item).text = data[position]
             convertView
         }
+        Log.d("dataaaChild", " = ${Gson().toJson(data)}")
+
+        view.setOnClickListener {
+            Log.d("datasdas", " = ${data[position]}")
+        }
+
         view.findViewById<TextView>(R.id.item).apply {
             parentAdapter.itemTextColor?.let { setTextColor(it) }
             parentAdapter.itemFontSize?.let { textSize = it }
@@ -284,3 +302,26 @@ class InnerDataAdapter(
     }
 
 }
+
+
+//class InnerDataAdapter2(
+//    private val context: Context,
+//    private val parentAdapter: AppDatePickerAdapter,
+//    private val data: List<String>
+//) : RecyclerView.Adapter<InnerDataViewHolder>() {
+//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InnerDataViewHolder {
+//
+//    }
+//
+//    override fun onBindViewHolder(holder: InnerDataViewHolder, position: Int) {
+//
+//    }
+//
+//    override fun getItemCount(): Int {
+//    }
+//
+//}
+//
+//class InnerDataViewHolder(itemView: View) : ViewHolder(itemView) {
+//
+//}
