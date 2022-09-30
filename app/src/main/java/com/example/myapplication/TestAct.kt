@@ -41,9 +41,15 @@ class TestAct: AppCompatActivity() {
         dateTemp2.set(Calendar.YEAR, 2022);
         dateTemp2.set(Calendar.MONTH, 8)
 
+        val dateTemp3 = Calendar.getInstance();
+        dateTemp3.set(Calendar.DAY_OF_MONTH, 15);
+        dateTemp3.set(Calendar.YEAR, 2022);
+        dateTemp3.set(Calendar.MONTH, 8)
+
         val data = arrayListOf<DateData>()
         data.add(DateData(dateTemp, arrayListOf("Mitra 1", "Agen")))
         data.add(DateData(dateTemp2, arrayListOf("Mitra 2", "Agen")))
+        data.add(DateData(dateTemp3, arrayListOf("Mitra 3", "Agen")))
 
         Log.d("dattt", " = ${Gson().toJson(data)}")
 
