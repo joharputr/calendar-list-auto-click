@@ -32,6 +32,10 @@ class TestAct: AppCompatActivity() {
             add(Calendar.DATE, 1)
         }
 
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, +14);
+        calendarView.setMaximumDate(cal)
+
         Log.d("datada", " = ${dataa}")
 
         val dateTemp = Calendar.getInstance();

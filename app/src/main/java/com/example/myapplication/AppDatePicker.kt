@@ -4,11 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.util.Log
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
 import java.util.*
 
 class AppDatePicker(val ctx: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
@@ -17,6 +15,7 @@ class AppDatePicker(val ctx: Context, attrs: AttributeSet?, defStyleAttr: Int, d
     lateinit var typedArray: TypedArray
 
     @SuppressLint("SimpleDateFormat")
+
     private val startDate = Calendar.getInstance().apply {
         this.set(Calendar.YEAR, this.get(Calendar.YEAR) - 100)
     }
@@ -53,8 +52,11 @@ class AppDatePicker(val ctx: Context, attrs: AttributeSet?, defStyleAttr: Int, d
     lateinit var appAdapter:AppDatePickerAdapter
 
     fun fillData(data: List<DateData>) {
-        Log.d("filldata", " = ${Gson().toJson(data)}");
-        appAdapter = AppDatePickerAdapter(data, ctx, typedArray, startDate, maxDate)
+
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.DAY_OF_YEAR, +15);
+
+        appAdapter = AppDatePickerAdapter(data, ctx, typedArray, startDate, cal)
         recyclerView.adapter = appAdapter
         recyclerView.scrollToPosition(appAdapter.getCurrentPosition())
     }

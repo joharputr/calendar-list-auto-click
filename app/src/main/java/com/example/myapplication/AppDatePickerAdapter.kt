@@ -96,9 +96,12 @@ class AppDatePickerAdapter(
         pickerBackgroundColor = getcolor(
             typedArray, R.styleable.AppDatePicker_pickerBackgroundColor, ctx.resources, Color.WHITE
         )
+
     }
 
     //list calendar
+
+
     private val row: Long = TimeUnit.DAYS.convert(
         maxDate.time.time - startDate.time.time,
         TimeUnit.MILLISECONDS
