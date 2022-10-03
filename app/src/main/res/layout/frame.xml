@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <com.applandeo.materialcalendarview.CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:selectionColor="#cc0000"
+        app:disabledDaysLabelsColor="@color/black"
+        app:eventsEnabled="true"
+        app:highlightedDaysLabelsColor="@color/black"
+        app:type="one_day_picker"
+        />
 
     <com.example.myapplication.AppDatePicker
         android:id="@+id/dtp"
@@ -24,4 +36,4 @@
 
 <!--    </androidx.recyclerview.widget.RecyclerView>-->
 
-</FrameLayout>
+</LinearLayout>

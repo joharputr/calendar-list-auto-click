@@ -7,19 +7,22 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import com.applandeo.materialcalendarview.EventDay
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.frame.*
 import java.util.*
 
 class TestAct: AppCompatActivity() {
 
-    lateinit var datePicker:AppDatePicker
-
+    lateinit var datePicker: AppDatePicker
+    val events: MutableList<EventDay> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val view = LayoutInflater.from(this).inflate(
             R.layout.frame, null, false
         )
+
         setContentView(
             view
         )
@@ -49,27 +52,26 @@ class TestAct: AppCompatActivity() {
         val data = arrayListOf<DateData>()
         data.add(DateData(dateTemp, arrayListOf("Mitra 1", "Agen")))
         data.add(DateData(dateTemp2, arrayListOf("Mitra 2", "Agen")))
-        data.add(DateData(dateTemp3, arrayListOf("Mitra 3", "Agen")))
+        data.add(DateData(dateTemp3, arrayListOf("Mitra 3", "Agen", "R", "sd", "dsdsdsd")))
 
         Log.d("dattt", " = ${Gson().toJson(data)}")
 
         datePicker.fillData(
             data.sortedByDescending { it.date }
-            //   arrayListOf<String>("a", "b", "cd"),
-            //    arrayListOf<DateData>().apply {
-            //    add(DateData(Calendar.getInstance(), arrayListOf("1", "2")))
-            //   add(DateData(dateTemp, arrayListOf("Mitra jncjk", "Agen")))
-            //                add(DateData(Calendar.getInstance().apply {
-//                    add(Calendar.DATE, 2)
-//                }, arrayListOf("5", "6")))
-            //   }
         )
 
-        view.findViewById<AppDatePicker>(R.id.dtp).addOnClickListener(object:OnItemClickListener{
+        events.add(EventDay(dateTemp3, R.drawable.ic_baseline_circle_24))
+        calendarView.setEvents(events)
+
+        view.findViewById<AppDatePicker>(R.id.dtp).addOnClickListener(object : OnItemClickListener {
             override fun onItemClick(date: Calendar, data: List<String>?) {
-                Log.e("iLOG","${date} ${data}")
+                Log.e("iLOG", "${date} ${data}")
             }
         })
+
+        calendarView.setOnDayClickListener {
+            datePicker.focusTo(it.calendar.timeInMillis)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -90,5 +92,4 @@ class TestAct: AppCompatActivity() {
         }
         return true
     }
-
 }

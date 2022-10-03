@@ -6,16 +6,15 @@ import android.content.res.TypedArray
 import android.graphics.Color
 import android.graphics.Typeface
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.ListView
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.date_picker_item.view.*
 import java.text.DateFormatSymbols
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -142,6 +141,9 @@ class AppDatePickerAdapter(
             itemView =
             LayoutInflater.from(ctx).inflate(R.layout.date_picker_layout, parent, false)
         ).apply {
+
+            Log.d("rowrowrow", " = ${row}")
+
             val listener = {
                 with(Calendar.getInstance()) {
                     listener?.let {
@@ -159,27 +161,28 @@ class AppDatePickerAdapter(
                     }
                 }
             }
+
             val cliclListener = View.OnClickListener {
                 listener()
             }
 
-            this.itemView.setOnClickListener {
-                listener()
-            }
-
-            this.itemView.findViewById<View>(R.id.cardView).setOnClickListener {
-                listener()
-            }
-            this.itemView.findViewById<ListView>(R.id.dataList).setOnItemClickListener { _, _, _, _ ->
-                listener()
-            }
-            this.itemView.findViewById<ListView>(R.id.dataList).setOnTouchListener { view, event ->
-                if (event.action == MotionEvent.ACTION_UP) {
-                    //klik item
-                    listener()
-                }
-                false
-            }
+//            this.itemView.setOnClickListener {
+//                listener()
+//            }
+//
+//            this.itemView.findViewById<View>(R.id.RecyclerView).setOnClickListener {
+//                listener()
+//            }
+//            this.itemView.findViewById<RecyclerView>(R.id.dataList).setOnItemClickListener { _, _, _, _ ->
+//                listener()
+//            }
+//            this.itemView.findViewById<ListView>(R.id.dataList).setOnTouchListener { view, event ->
+//                if (event.action == MotionEvent.ACTION_UP) {
+//                    //klik item
+//                    listener()
+//                }
+//                false
+//            }
         }
 
 
@@ -218,37 +221,39 @@ class AppDatePickerViewHolder(
                 findViewById<TextView>(R.id.dayOfMonthText).apply {
                     setTextColor(adapter.dayOfMonthColor)
                     text =
-                        get(Calendar.DAY_OF_MONTH).toString()
-                    setTypeface(adapter.dayOfMonthFont, Typeface.BOLD)
-                    setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.dayOfMonthFontSizeInDp)
+                        get(Calendar.DAY_OF_MONTH).toString() + " "
+                    //  setTypeface(adapter.dayOfMonthFont, Typeface.BOLD)
+                    //     setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.monthFontSizeInDp)
                 }
 
                 findViewById<TextView>(R.id.monthText).apply {
                     setTextColor(adapter.monthFontColor)
-                    text = dateFormatSymbols.months[get(Calendar.MONTH)]
+                    text = dateFormatSymbols.months[get(Calendar.MONTH)] + " "
                     typeface = adapter.monthFont
-                    setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.monthFontSizeInDp)
+                    //   setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.monthFontSizeInDp)
                 }
 
                 findViewById<TextView>(R.id.dayOfWeekText).apply {
                     setTextColor(adapter.dayOfWeekColor)
                     text =
-                        dateFormatSymbols.weekdays[get(Calendar.DAY_OF_WEEK)]
+                        dateFormatSymbols.weekdays[get(Calendar.DAY_OF_WEEK)] + ", "
                     typeface = adapter.dayOfWeekFont
 
-                    setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.dayOfWeekFontSizeInDp)
+                    //       setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.dayOfWeekFontSizeInDp)
                 }
 
                 findViewById<TextView>(R.id.year).apply {
                     setTextColor(adapter.yearColor)
-                    text = get(Calendar.YEAR).toString()
+                    text = get(Calendar.YEAR).toString() + " "
                     typeface = adapter.yearFont
-                    setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.yearFontSizeInDp)
+                    //       setTextSize(TypedValue.COMPLEX_UNIT_PX, adapter.yearFontSizeInDp)
                 }
 
                 Log.d("dalist", " = ${Gson().toJson(data)}")
-                findViewById<ListView>(R.id.dataList).adapter = data?.let {
-                    InnerDataAdapter(context, adapter, data)
+                findViewById<RecyclerView>(R.id.dataList).run {
+                    adapter =
+                        InnerDataAdapter2(context, data)
+                    layoutManager = LinearLayoutManager(context)
                 }
 //
 //                    ?: kotlin.run {
@@ -290,10 +295,9 @@ class InnerDataAdapter(
             convertView
         }
 
-        Log.d("", " = ${Gson().toJson(data)}")
-
         //klik data
         view.setOnClickListener {
+            Log.d("Dataact", " = ${Gson().toJson(data)}")
             Log.d("datasdas", " = ${data!!.data[position]} = ${data.date}")
         }
 
@@ -307,25 +311,34 @@ class InnerDataAdapter(
 
 }
 
+class InnerDataAdapter2(
+    private val ctx: Context,
+    private val data: DateData?
+) : RecyclerView.Adapter<InnerDataAdapter2.ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(
+            LayoutInflater.from(ctx).inflate(R.layout.date_picker_item, parent, false)
+        )
+    }
 
-//class InnerDataAdapter2(
-//    private val context: Context,
-//    private val parentAdapter: AppDatePickerAdapter,
-//    private val data: List<String>
-//) : RecyclerView.Adapter<InnerDataViewHolder>() {
-//    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InnerDataViewHolder {
-//
-//    }
-//
-//    override fun onBindViewHolder(holder: InnerDataViewHolder, position: Int) {
-//
-//    }
-//
-//    override fun getItemCount(): Int {
-//    }
-//
-//}
-//
-//class InnerDataViewHolder(itemView: View) : ViewHolder(itemView) {
-//
-//}
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item = data!!.data[position]
+        holder.vView.item.setText(item ?: "")
+
+        holder.vView.item.setOnClickListener {
+            Log.d("datasdas", " = ${data.data[position]} = ${data.date}")
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return data?.data?.size ?: 0
+    }
+
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val vView = view.item
+    }
+
+}
+
+
